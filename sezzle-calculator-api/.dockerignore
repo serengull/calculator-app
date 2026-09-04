@@ -1,0 +1,9 @@
+.git
+.idea
+*.md
+Dockerfile
+.dockerignore
+Makefile
+coverage.out
+coverage.full.out
+server

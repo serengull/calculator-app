@@ -1,0 +1,104 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "A single-endpoint arithmetic API.\nEvery error response shares one shape. requestId correlates with the server logs, and error carries the raw internal error but is only populated under the dev profile.",
+        "title": "Sezzle Calculator API",
+        "contact": {},
+        "license": {
+            "name": "MIT"
+        },
+        "version": "1.0.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/calculate": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "calculator"
+                ],
+                "summary": "Perform arithmetic operation",
+                "parameters": [
+                    {
+                        "type": "number",
+                        "description": "First operand",
+                        "name": "first",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Second operand",
+                        "name": "second",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "enum": [
+                            "sum",
+                            "subtract",
+                            "multiply",
+                            "division"
+                        ],
+                        "type": "string",
+                        "description": "Operation",
+                        "name": "op",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/internal_infrastructure_handler.CalculateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/sezzle-calculator-api_internal_infrastructure_error.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/sezzle-calculator-api_internal_infrastructure_error.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "internal_infrastructure_handler.CalculateResponse": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "type": "number"
+                }
+            }
+        },
+        "sezzle-calculator-api_internal_infrastructure_error.Response": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "requestId": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

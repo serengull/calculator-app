@@ -1,0 +1,21 @@
+# Each project also ignores its own build output; these are the cross-cutting
+# and root-level cases. The exported reports in coverage/ are committed on
+# purpose — they are part of the deliverable.
+
+# macOS
+.DS_Store
+
+# Editors
+.idea/
+.vscode/
+*.swp
+
+# Local environment; the .env.example files are committed
+.env
+.env.local
+*.local
+
+# Dependencies and build output
+node_modules/
+dist/
+*.tsbuildinfo

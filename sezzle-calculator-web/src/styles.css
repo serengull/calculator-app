@@ -1,0 +1,275 @@
+:root {
+  color-scheme: dark;
+
+  --desktop-top: #3b4a63;
+  --desktop-bottom: #1d2230;
+
+  --window: #2b2b2b;
+  --window-chrome: #343434;
+  --window-border: rgba(255, 255, 255, 0.09);
+
+  --display-text: #ffffff;
+  --key-digit: #4d4d4d;
+  --key-digit-hover: #5c5c5c;
+  --key-function: #6b6b6b;
+  --key-function-hover: #7a7a7a;
+  --key-operator: #ff9f0a;
+  --key-operator-hover: #ffb03d;
+  --key-armed: #ffffff;
+  --key-text: #ffffff;
+  --key-text-dark: #1a1a1a;
+
+  --danger: #ff6b6b;
+  --muted: rgba(255, 255, 255, 0.5);
+
+  --key-size: 60px;
+  --key-gap: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: linear-gradient(160deg, var(--desktop-top), var(--desktop-bottom));
+  color: var(--display-text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue",
+    system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+}
+
+/* ---- Window chrome ---------------------------------------------------- */
+
+.window {
+  width: 296px;
+  max-width: 100%;
+  background: var(--window);
+  border: 1px solid var(--window-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.25),
+    0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+.window__titlebar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 12px;
+  background: var(--window-chrome);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+.window__light {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4a4a4a;
+}
+
+.window__light--close { background: #ff5f57; }
+.window__light--minimize { background: #febc2e; }
+.window__light--zoom { background: #28c840; }
+
+.window__title {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  pointer-events: none;
+}
+
+/* ---- Calculator ------------------------------------------------------- */
+
+.calculator {
+  padding: 10px;
+}
+
+
+
+
+
+.calculator__display {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 84px;
+  /* Inset further than the keypad so long values breathe at the edges. */
+  padding: 2px 18px 14px;
+  overflow: hidden;
+}
+
+/* One display row. The text is measured against this box and shrunk to fit. */
+.calculator__line {
+  width: 100%;
+  overflow: hidden;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.calculator__line--history {
+  min-height: 17px;
+}
+
+/*
+ * Only when the text cannot fit even at its smallest size: fade the left edge
+ * so it reads as continuing past the window rather than as a shorter number.
+ */
+.calculator__line[data-clipped] {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 32px);
+  mask-image: linear-gradient(to right, transparent 0, #000 32px);
+}
+
+/* The previous calculation, empty until one completes. */
+.calculator__history-line {
+  display: inline-block;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.calculator__value {
+  display: inline-block;
+  font-size: clamp(30px, 12vw, 54px);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transition: opacity 120ms ease;
+}
+
+.calculator[data-pending] .calculator__value {
+  opacity: 0.45;
+}
+
+.calculator__keys {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--key-gap);
+}
+
+.key {
+  height: var(--key-size);
+  border: 0;
+  border-radius: 10px;
+  background: var(--key-digit);
+  color: var(--key-text);
+  font-family: inherit;
+  font-size: 22px;
+  font-weight: 400;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color 90ms ease,
+    color 90ms ease,
+    transform 90ms ease;
+}
+
+.key[data-wide] {
+  grid-column: span 2;
+}
+
+.key[data-kind='function'] {
+  background: var(--key-function);
+  font-size: 20px;
+}
+
+/* The scientific strip sits above the classic macOS grid. */
+.key[data-wide][data-kind='function'] {
+  height: 40px;
+  background: #5a5a5a;
+  font-size: 17px;
+}
+
+.key[data-wide][data-kind='function']:hover:not(:disabled) {
+  background: #6a6a6a;
+}
+
+.key[data-kind='operator'] {
+  background: var(--key-operator);
+  font-size: 26px;
+}
+
+.key:hover:not(:disabled) { background: var(--key-digit-hover); }
+.key[data-kind='function']:hover:not(:disabled) { background: var(--key-function-hover); }
+.key[data-kind='operator']:hover:not(:disabled) { background: var(--key-operator-hover); }
+
+/* The operator awaiting its second operand inverts, as it does on macOS. */
+.key[data-armed],
+.key[data-armed]:hover:not(:disabled) {
+  background: var(--key-armed);
+  color: var(--key-operator);
+}
+
+.key:active:not(:disabled),
+.key[data-active] {
+  transform: scale(0.96);
+  filter: brightness(1.25);
+}
+
+.key:focus-visible {
+  outline: 2px solid #4a9eff;
+  outline-offset: 2px;
+}
+
+.key:disabled {
+  cursor: default;
+  opacity: 0.75;
+}
+
+/* ---- Error line ------------------------------------------------------- */
+
+.calculator__error {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 10px 2px 2px;
+  color: var(--danger);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+
+.hint {
+  margin: 14px 0 0;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .key,
+  .calculator__value {
+    transition: none;
+  }
+  .key:active:not(:disabled),
+  .key[data-active] {
+    transform: none;
+  }
+}
+

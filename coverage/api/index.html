@@ -1,0 +1,532 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>service: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">sezzle-calculator-api/internal/domain/service/calculator_service.go (100.0%)</option>
+				
+				<option value="file1">sezzle-calculator-api/internal/infrastructure/error/custom_errors.go (50.0%)</option>
+				
+				<option value="file2">sezzle-calculator-api/internal/infrastructure/error/error_handler.go (83.8%)</option>
+				
+				<option value="file3">sezzle-calculator-api/internal/infrastructure/handler/calculator_handler.go (100.0%)</option>
+				
+				<option value="file4">sezzle-calculator-api/internal/infrastructure/handler/health_handler.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">no coverage</span>
+				<span class="cov1">low coverage</span>
+				<span class="cov2">*</span>
+				<span class="cov3">*</span>
+				<span class="cov4">*</span>
+				<span class="cov5">*</span>
+				<span class="cov6">*</span>
+				<span class="cov7">*</span>
+				<span class="cov8">*</span>
+				<span class="cov9">*</span>
+				<span class="cov10">high coverage</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package service
+
+import (
+        "errors"
+        "math"
+)
+
+// Errors caused by the caller's input rather than by a fault in the service.
+// The handler maps these to 400; anything else stays a 500.
+var (
+        ErrDivideByZero       = errors.New("cannot divide by zero")
+        ErrNegativeSquareRoot = errors.New("cannot take the square root of a negative number")
+)
+
+type CalculatorService interface {
+        Sum(first float64, second float64) (float64, error)
+        Subtract(first float64, second float64) (float64, error)
+        Division(first float64, second float64) (float64, error)
+        Multiply(first float64, second float64) (float64, error)
+        Exponentiation(base float64, exponent float64) (float64, error)
+        SquareRoot(value float64) (float64, error)
+        Percentage(value float64) (float64, error)
+}
+
+type CalculatorServiceImpl struct{}
+
+func (cs *CalculatorServiceImpl) Sum(first float64, second float64) (float64, error) <span class="cov8" title="13">{
+        return first + second, nil
+}</span>
+
+func (cs *CalculatorServiceImpl) Subtract(first float64, second float64) (float64, error) <span class="cov7" title="10">{
+        return first - second, nil
+}</span>
+
+func (cs *CalculatorServiceImpl) Multiply(first float64, second float64) (float64, error) <span class="cov7" title="11">{
+        return first * second, nil
+}</span>
+
+func (cs *CalculatorServiceImpl) Division(first float64, second float64) (float64, error) <span class="cov9" title="17">{
+        if second == 0 </span><span class="cov4" title="3">{
+                return 0, ErrDivideByZero
+        }</span>
+        <span class="cov8" title="14">return first / second, nil</span>
+}
+
+func (cs *CalculatorServiceImpl) Exponentiation(base float64, exponent float64) (float64, error) <span class="cov10" title="22">{
+        return math.Pow(base, exponent), nil
+}</span>
+
+func (cs *CalculatorServiceImpl) SquareRoot(value float64) (float64, error) <span class="cov8" title="12">{
+        if value &lt; 0 </span><span class="cov3" title="2">{
+                return 0, ErrNegativeSquareRoot
+        }</span>
+        <span class="cov7" title="10">return math.Sqrt(value), nil</span>
+}
+
+func (cs *CalculatorServiceImpl) Percentage(value float64) (float64, error) <span class="cov7" title="11">{
+        return value / 100, nil
+}</span>
+
+func NewCalculatorService() CalculatorService <span class="cov8" title="12">{
+        return &amp;CalculatorServiceImpl{}
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package error
+
+import (
+        "net/http"
+        "time"
+
+        "github.com/rs/zerolog"
+)
+
+const (
+        resourceNotFoundTitle    = "Not found"
+        resourceNotFoundMessage  = "Resource not found"
+        resourceConflictTitle    = "Already exists"
+        resourceConflictMessage  = "Resource already exists"
+        internalServerErrorTitle = "Internal Server Error"
+)
+
+func (err SezzleError) Error() string <span class="cov0" title="0">{
+        return err.Detail
+}</span>
+
+func (err SezzleError) StatusCode() int <span class="cov10" title="21">{
+        return err.Status
+}</span>
+
+func (err SezzleError) MarshalZerologObject(e *zerolog.Event) <span class="cov10" title="21">{
+        e.Int("status", err.Status).
+                Str("title", err.Title).
+                Str("detail", err.Detail).
+                Str("message", err.Message).
+                Str("request_method", err.RequestMethod).
+                Str("request_uri", err.RequestUri)
+}</span>
+
+func BadRequest(detail string) error <span class="cov10" title="21">{
+        return makeSezzleError(http.StatusBadRequest, detail, "", "")
+}</span>
+
+func InternalServerError(detail string) error <span class="cov0" title="0">{
+        return makeSezzleError(http.StatusInternalServerError, detail, internalServerErrorTitle, "")
+}</span>
+
+func NotFound(detail string) error <span class="cov0" title="0">{
+        return makeSezzleError(http.StatusNotFound, detail, resourceNotFoundTitle, resourceNotFoundMessage)
+}</span>
+
+func Conflict(detail string) error <span class="cov0" title="0">{
+        return makeSezzleError(http.StatusConflict, detail, resourceConflictTitle, resourceConflictMessage)
+}</span>
+
+func makeSezzleError(code int, detail string, title string, message string) error <span class="cov10" title="21">{
+        return &amp;SezzleError{
+                Title:   title,
+                Message: message,
+                Status:  code,
+                Detail:  detail,
+                Instant: time.Now(),
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package error
+
+import (
+        "errors"
+        "net/http"
+        "time"
+
+        "github.com/labstack/echo/v5"
+        "github.com/rs/zerolog/log"
+)
+
+type SezzleError struct {
+        Title         string    `json:"title"`
+        Status        int       `json:"status"`
+        Detail        string    `json:"detail"`
+        RequestUri    string    `json:"requestUri"`
+        RequestMethod string    `json:"requestMethod"`
+        Instant       time.Time `json:"instant"`
+        Message       string    `json:"message"`
+}
+
+type Response struct {
+        Message   string `json:"message"`
+        RequestID string `json:"requestId,omitempty"`
+        Error     string `json:"error,omitempty"`
+}
+
+func NewHTTPErrorHandler(exposeError bool) echo.HTTPErrorHandler <span class="cov10" title="41">{
+        return func(c *echo.Context, err error) </span><span class="cov8" title="27">{
+                if err == nil </span><span class="cov0" title="0">{
+                        return
+                }</span>
+
+                <span class="cov8" title="27">if res, _ := echo.UnwrapResponse(c.Response()); res != nil &amp;&amp; res.Committed </span><span class="cov0" title="0">{
+                        return
+                }</span>
+
+                <span class="cov8" title="27">code, message := statusAndMessage(err)
+                requestID := c.Response().Header().Get(echo.HeaderXRequestID)
+
+                l := log.With().
+                        Int("status", code).
+                        Str("method", c.Request().Method).
+                        Str("path", c.Request().URL.Path).
+                        Str("route", c.Path()).
+                        Str("ip", c.RealIP()).
+                        Str("request_id", requestID).
+                        Logger()
+
+                if code &gt;= http.StatusInternalServerError </span><span class="cov4" title="4">{
+                        l.Error().Err(err).Msg("request failed")
+                }</span> else<span class="cov8" title="23"> {
+                        l.Warn().Err(err).Msg("request rejected")
+                }</span>
+
+                <span class="cov8" title="27">body := Response{Message: message, RequestID: requestID}
+                if exposeError </span><span class="cov1" title="1">{
+                        body.Error = err.Error()
+                }</span>
+
+                <span class="cov8" title="27">var writeErr error
+                if c.Request().Method == http.MethodHead </span><span class="cov0" title="0">{
+                        writeErr = c.NoContent(code)
+                }</span> else<span class="cov8" title="27"> {
+                        writeErr = c.JSON(code, body)
+                }</span>
+                <span class="cov8" title="27">if writeErr != nil </span><span class="cov0" title="0">{
+                        l.Error().Err(writeErr).Msg("failed to write error response")
+                }</span>
+        }
+}
+
+func statusAndMessage(err error) (int, string) <span class="cov8" title="27">{
+        code := http.StatusInternalServerError
+
+        var coder echo.HTTPStatusCoder
+        if errors.As(err, &amp;coder) </span><span class="cov8" title="23">{
+                if sc := coder.StatusCode(); sc != 0 </span><span class="cov8" title="23">{
+                        code = sc
+                }</span>
+        }
+
+        <span class="cov8" title="27">var sezzleErr *SezzleError
+        if errors.As(err, &amp;sezzleErr) </span><span class="cov8" title="21">{
+                message := sezzleErr.Message
+                if message == "" </span><span class="cov8" title="21">{
+                        message = sezzleErr.Detail
+                }</span>
+                <span class="cov8" title="21">if message == "" </span><span class="cov0" title="0">{
+                        message = http.StatusText(code)
+                }</span>
+                <span class="cov8" title="21">return code, message</span>
+        }
+
+        <span class="cov5" title="6">var httpErr *echo.HTTPError
+        if errors.As(err, &amp;httpErr) &amp;&amp; httpErr.Message != "" </span><span class="cov0" title="0">{
+                return code, httpErr.Message
+        }</span>
+
+        <span class="cov5" title="6">return code, http.StatusText(code)</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package handler
+
+import (
+        "errors"
+        "math"
+        "net/http"
+        "sezzle-calculator-api/internal/domain/service"
+        sezzleerror "sezzle-calculator-api/internal/infrastructure/error"
+
+        "github.com/labstack/echo/v5"
+)
+
+type CalculatorHandler struct {
+        calculatorService service.CalculatorService
+}
+
+type OperationKind string
+
+const supportedOperations = "sum, subtract, multiply, division, exponentiation, sqrt, percentage"
+
+const (
+        Sum      OperationKind = "sum"
+        Subtract OperationKind = "subtract"
+        Multiply OperationKind = "multiply"
+        Division OperationKind = "division"
+
+        Exponentiation OperationKind = "exponentiation"
+        SquareRoot     OperationKind = "sqrt"
+        Percentage     OperationKind = "percentage"
+)
+
+type CalculateRequest struct {
+        First         float64       `query:"first"`
+        Second        float64       `query:"second"`
+        OperationKind OperationKind `query:"op"`
+}
+
+type CalculateResponse struct {
+        Result float64 `json:"result"`
+}
+
+func NewCalculatorHandler(calculatorService service.CalculatorService) *CalculatorHandler <span class="cov8" title="37">{
+        return &amp;CalculatorHandler{calculatorService: calculatorService}
+}</span>
+
+// CalculateHandler godoc
+// @Summary      Perform arithmetic operation
+// @Tags         calculator
+// @Produce      json
+// @Param        first   query  number  true  "First operand"
+// @Param        second  query  number  true  "Second operand"
+// @Param        op      query  string  true  "Operation" Enums(sum, subtract, multiply, division, exponentiation, sqrt, percentage)
+// @Success      200     {object} CalculateResponse
+// @Failure      400     {object} sezzleerror.Response
+// @Failure      500     {object} sezzleerror.Response
+// @Router       /calculate [get]
+func (ch *CalculatorHandler) CalculateHandler(c *echo.Context) error <span class="cov8" title="37">{
+        var req CalculateRequest
+        if err := c.Bind(&amp;req); err != nil </span><span class="cov2" title="2">{
+                return sezzleerror.BadRequest("first and second must be numbers")
+        }</span>
+
+        <span class="cov8" title="35">op := ch.handleOp(req.OperationKind)
+        if op == nil </span><span class="cov3" title="3">{
+                return sezzleerror.BadRequest("op must be one of: " + supportedOperations)
+        }</span>
+
+        <span class="cov8" title="32">if err := validateOperands(c, req); err != nil </span><span class="cov4" title="5">{
+                return err
+        }</span>
+
+        <span class="cov7" title="27">result, err := op(req.First, req.Second)
+        if err != nil </span><span class="cov4" title="5">{
+                if errors.Is(err, service.ErrDivideByZero) || errors.Is(err, service.ErrNegativeSquareRoot) </span><span class="cov2" title="2">{
+                        return sezzleerror.BadRequest(err.Error())
+                }</span>
+                <span class="cov3" title="3">return err</span>
+        }
+
+        <span class="cov7" title="21">if !isFinite(result) </span><span class="cov5" title="9">{
+                return sezzleerror.BadRequest("result is out of range")
+        }</span>
+
+        <span class="cov6" title="12">return c.JSON(http.StatusOK, CalculateResponse{Result: result})</span>
+}
+
+// isFinite reports whether the value can be represented in JSON.
+func isFinite(value float64) bool <span class="cov10" title="73">{
+        return !math.IsInf(value, 0) &amp;&amp; !math.IsNaN(value)
+}</span>
+
+// isUnary reports whether the operation is computed from first alone.
+func isUnary(op OperationKind) bool <span class="cov8" title="32">{
+        return op == SquareRoot || op == Percentage
+}</span>
+
+// validateOperands rejects absent operands. Binding cannot tell a missing
+// query parameter from an explicit zero, so the raw query is checked instead.
+func validateOperands(c *echo.Context, req CalculateRequest) error <span class="cov8" title="32">{
+        query := c.Request().URL.Query()
+        binary := !isUnary(req.OperationKind)
+
+        if !query.Has("first") </span><span class="cov1" title="1">{
+                return sezzleerror.BadRequest("first is required")
+        }</span>
+        <span class="cov8" title="31">if binary &amp;&amp; !query.Has("second") </span><span class="cov1" title="1">{
+                return sezzleerror.BadRequest("second is required")
+        }</span>
+
+        // ParseFloat accepts "Inf" and "NaN", which are not usable operands.
+        <span class="cov8" title="30">if !isFinite(req.First) || (binary &amp;&amp; !isFinite(req.Second)) </span><span class="cov3" title="3">{
+                return sezzleerror.BadRequest("first and second must be numbers")
+        }</span>
+
+        <span class="cov7" title="27">return nil</span>
+}
+
+func (ch *CalculatorHandler) handleOp(op OperationKind) func(first, second float64) (float64, error) <span class="cov8" title="35">{
+        switch op </span>{
+        case Sum:<span class="cov6" title="13">
+                return ch.calculatorService.Sum</span>
+        case Subtract:<span class="cov2" title="2">
+                return ch.calculatorService.Subtract</span>
+        case Multiply:<span class="cov3" title="3">
+                return ch.calculatorService.Multiply</span>
+        case Division:<span class="cov4" title="5">
+                return ch.calculatorService.Division</span>
+        case Exponentiation:<span class="cov3" title="3">
+                return ch.calculatorService.Exponentiation</span>
+        // The unary operations ignore second so they share one dispatch signature.
+        case SquareRoot:<span class="cov3" title="4">
+                return func(first, _ float64) (float64, error) </span><span class="cov3" title="4">{
+                        return ch.calculatorService.SquareRoot(first)
+                }</span>
+        case Percentage:<span class="cov2" title="2">
+                return func(first, _ float64) (float64, error) </span><span class="cov2" title="2">{
+                        return ch.calculatorService.Percentage(first)
+                }</span>
+        default:<span class="cov3" title="3">
+                return nil</span>
+        }
+}
+
+func (ch *CalculatorHandler) Register(e *echo.Echo) <span class="cov8" title="37">{
+        e.GET("/calculate", ch.CalculateHandler)
+}</span>
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package handler
+
+import (
+        "net/http"
+
+        "github.com/labstack/echo/v5"
+)
+
+type HealthHandler struct{}
+
+type HealthResponse struct {
+        Status string `json:"status"`
+}
+
+const statusAlive = "ok"
+
+func NewHealthHandler() *HealthHandler <span class="cov10" title="5">{
+        return &amp;HealthHandler{}
+}</span>
+
+// LivenessHandler godoc
+// @Summary      Liveness probe
+// @Description  Reports that the process is up and serving. It performs no
+// @Description  dependency checks, so a failure means the server itself is gone.
+// @Tags         health
+// @Produce      json
+// @Success      200  {object} HealthResponse
+// @Router       /health/live [get]
+func (hh *HealthHandler) LivenessHandler(c *echo.Context) error <span class="cov7" title="3">{
+        return c.JSON(http.StatusOK, HealthResponse{Status: statusAlive})
+}</span>
+
+func (hh *HealthHandler) Register(e *echo.Echo) <span class="cov10" title="5">{
+        e.GET("/health/live", hh.LivenessHandler)
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

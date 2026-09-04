@@ -1,0 +1,9 @@
+/server
+/coverage.out
+/coverage.full.out
+/coverage.html
+node_modules/
+dist/
+coverage/
+.DS_Store
+.idea/

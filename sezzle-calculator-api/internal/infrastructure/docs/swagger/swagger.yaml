@@ -1,0 +1,72 @@
+basePath: /
+definitions:
+  internal_infrastructure_handler.CalculateResponse:
+    properties:
+      result:
+        type: number
+    type: object
+  sezzle-calculator-api_internal_infrastructure_error.Response:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+      requestId:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: |-
+    A single-endpoint arithmetic API.
+    Every error response shares one shape. requestId correlates with the server logs, and error carries the raw internal error but is only populated under the dev profile.
+  license:
+    name: MIT
+  title: Sezzle Calculator API
+  version: 1.0.0
+paths:
+  /calculate:
+    get:
+      parameters:
+      - description: First operand
+        in: query
+        name: first
+        required: true
+        type: number
+      - description: Second operand
+        in: query
+        name: second
+        required: true
+        type: number
+      - description: Operation
+        enum:
+        - sum
+        - subtract
+        - multiply
+        - division
+        in: query
+        name: op
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_infrastructure_handler.CalculateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/sezzle-calculator-api_internal_infrastructure_error.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/sezzle-calculator-api_internal_infrastructure_error.Response'
+      summary: Perform arithmetic operation
+      tags:
+      - calculator
+schemes:
+- http
+- https
+swagger: "2.0"
